@@ -3,47 +3,57 @@ import React, { useState } from 'react';
 const PdfForm = () => {
   const [pdfData, setPdfData] = useState({
     pdfname: '',
-    pdfFile: '',
+    filename:'' ,
   });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+
     setPdfData({
-      ...pdfData,[name]:value,
+      ...pdfData,
+      [name] : value,
     });
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log("PDF Data:", pdfData);
+  };
+
   return (
-    <div className="p-4 max-w-md mx-auto bg-white rounded-lg shadow-md">
-      <form>
-        <label htmlFor="pdfname" className="block text-sm font-medium text-gray-700">
-          PDF Name
+    <form onSubmit={handleSubmit} className="p-4 space-y-4 bg-gray-100 rounded-lg shadow-md">
+      <div>
+        <label htmlFor="pdfname" className="block font-medium">
+          PDF Name:
         </label>
         <input
           type="text"
           name="pdfname"
           id="pdfname"
+          placeholder="Enter PDF name"
+          value={pdfData.pdfname}
           onChange={handleChange}
-          value={pdfname.PdfForm}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          className="w-full p-2 border rounded-md"
         />
+      </div>
 
-        <label htmlFor="pdfFile" className="block text-sm font-medium text-gray-700 mt-4">
-          Upload PDF
+      <div>
+        <label htmlFor="filename" className="block font-medium">
+          PDF File:
         </label>
         <input
           type="file"
-          name="pdfFile"
-          id="pdfFile"
+          name="filename"
+          id="filename"
           onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          className="w-full p-2 border rounded-md"
         />
+      </div>
 
-        <button type="submit" className="mt-4 w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700">
-          Submit
-        </button>
-      </form>
-    </div>
+      <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded-md">
+        Submit
+      </button>
+    </form>
   );
 };
 
