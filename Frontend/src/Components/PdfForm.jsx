@@ -31,7 +31,7 @@ const PdfForm = () => {
           name="pdfname"
           id="pdfname"
           placeholder="Enter PDF name"
-          value={pdfData.pdfname}
+          value={pdfData.pdfname  }
           onChange={handleChange}
           className="w-full p-2 border rounded-md"
         />
