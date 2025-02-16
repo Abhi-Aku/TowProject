@@ -1,64 +1,43 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
 const app = express();
-const mongoose = require("mongoose");
-app.use(express.json());
-const cors = require("cors");
-app.use(cors());
-app.use("/files", express.static("files"));
-//mongodb connection----------------------------------------------
-const mongoUrl =
-  "mongodb://localhost:27017/FilePdf";
+const port = 3000;
 
-mongoose
-  .connect(mongoUrl, {
+const MONGOODB_URL = "mongodb://localhost:27017/PDFFILE";
+
+mongoose.connect(MONGOODB_URL, {
     useNewUrlParser: true,
-  })
-  .then(() => {
-    console.log("Connected to database");
-  })
-  .catch((e) => console.log(e));
-//multer------------------------------------------------------------
-const multer = require("multer");
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./files");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + file.originalname);
-  },
+    useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB");
+}).catch(err => {
+    console.log("Error connecting to MongoDB", err);
 });
 
-require("./pdfDetails");
-const PdfSchema = mongoose.model("PdfDetails");
-const upload = multer({ storage: storage });
+app.use(bodyParser.json());
+app.use(cors());
 
-app.post("/upload-files", upload.single("file"), async (req, res) => {
-  console.log(req.file);
-  const title = req.body.title;
-  const fileName = req.file.filename;
-  try {
-    await PdfSchema.create({ title: title, pdf: fileName });
-    res.send({ status: "ok" });
-  } catch (error) {
-    res.json({ status: error });
-  }
+const PdfSchema = new mongoose.Schema({
+    pdfname: { type: String, required: true }
 });
 
-app.get("/get-files", async (req, res) => {
-  try {
-    PdfSchema.find({}).then((data) => {
-      res.send({ status: "ok", data: data });
-    });
-  } catch (error) {}
+const PdfModel = mongoose.model('PdfModel', PdfSchema);
+
+app.post('/upload', async (req, res) => {
+    try {
+        const { pdfname } = req.body;
+        const newPdf = new PdfModel({ pdfname });
+        const response = await newPdf.save();
+        res.json({ message: "Pdf uploaded successfully", response });
+    } catch (error) {
+        console.error(error);
+        res.status(400).send({ message: "Error uploading file" });
+    }
 });
 
-//apis----------------------------------------------------------------
-app.get("/", async (req, res) => {
-  res.send("Success!!!!!!");
-});
-
-app.listen(5000, () => {
-  console.log("Server Started");
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
 });
